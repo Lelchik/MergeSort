@@ -1,0 +1,18 @@
+.number{
+	  /* color: red; */
+  float: left;
+  width: 20px;
+}
+.number.select{
+	background: red;
+}
+.step{
+	width:100%;
+}
+#inf{
+	width:1400px;
+}
+.space{
+	float: left;
+	width:50px;
+}
