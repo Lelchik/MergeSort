@@ -40,7 +40,7 @@ function MergeSort() {
             array[i][0] = Math.floor(Math.random() * 100);
         }
         return array;
-    }
+    };
 
     function Break(Arr) {
         var newArr = [];
@@ -86,105 +86,56 @@ function MergeSort() {
                 l++;
             }
         }
-        this.trigger('end_merge', newArr.length);
+        this.trigger('end_merge', newArr);
         return (newArr);
-    }
-    this.Sort = function() {
-        document.getElementById('inf').innerHTML = '';
-        this.array = getArray(Math.floor(Math.random() * 15) + 1);
+    };
+    this.show_string = function(count, Arr) {
         var d = document.createElement('div');
         d.className = 'step';
-        d.id = 'step_0';
+        d.id = 'step_' + count;
         var j, space;
-        for (i = 0; i < this.array.length; i++) {
+        for (i = 0; i < Arr.length; i++) {
             space = '';
 
-            for (j = 0; j < this.array[i].length; j++) {
-                d.innerHTML += '<div class = "number">' + this.array[i][j] + '</div>';
+            for (j = 0; j < Arr[i].length; j++) {
+                d.innerHTML += '<div class = "number">' + Arr[i][j] + '</div>';
                 space += '<div class = "space">&nbsp</div>';
             }
             d.innerHTML += space;
         }
         d.innerHTML += '<br>';
         document.getElementById('inf').appendChild(d);
-        var count = 1;
-        while (this.array.length !== 1 && count < 10) {
-            //console.log(this.array.join('+++'));
-            this.array = Merge(this.array);
-            d = document.createElement('div');
-            d.className = 'step';
-            d.id = 'step_' + count;
-            count++;
-            for (i = 0; i < this.array.length; i++) {
-                space = '';
-                for (j = 0; j < this.array[i].length; j++) {
-                    d.innerHTML += '<div class = "number">' + this.array[i][j] + '</div>';
-                    space += '<div class = "space">&nbsp</div>';
-                }
-                d.innerHTML += space;
-            }
-            d.innerHTML += '<br>';
-            document.getElementById('inf').appendChild(d);
-        }
     };
 }
 
 function Start() {
     var mergesort = new MergeSort();
     mergesort.on('first', function(data) {
-        console.log('first', data);
+        console.log('first', data, count_step);
     });
     mergesort.on('second', function(data) {
-        console.log('second', data);
+        console.log('second', data, count_step);
     });
     mergesort.on('end', function(data) {
-        console.log('end', data);
+        console.log('end', data, count_step);
     });
     mergesort.on('show', function(data) {
-        console.log('show', data);
+        console.log('show', data, count_step);
     });
     var count_step = 0;
-    mergesort.on('end_merge', function(data) {
-        console.log('end_merge', data, count_step);
+    mergesort.on('end_merge', function(array) {
+        var data = array.length;
+        console.log('end_merge', count_step, array.length);
         count_step++;
+        mergesort.show_string(count, array);
+        if (data > 1 && count_step < 10) {
+            array = mergesort.Merge(array);
+        }
     });
 
-
     document.getElementById('inf').innerHTML = '';
-    this.array = mergesort.getArray(Math.floor(Math.random() * 15) + 1);
-    var d = document.createElement('div');
-    d.className = 'step';
-    d.id = 'step_0';
-    var j, space;
-    for (i = 0; i < this.array.length; i++) {
-        space = '';
-
-        for (j = 0; j < this.array[i].length; j++) {
-            d.innerHTML += '<div class = "number">' + this.array[i][j] + '</div>';
-            space += '<div class = "space">&nbsp</div>';
-        }
-        d.innerHTML += space;
-    }
-    d.innerHTML += '<br>';
-    document.getElementById('inf').appendChild(d);
+    array = mergesort.getArray(Math.floor(Math.random() * 15) + 1);
+    mergesort.show_string(0, array);
     var count = 1;
-    while (this.array.length !== 1 && count < 10) {
-        //console.log(this.array.join('+++'));
-        this.array = mergesort.Merge(this.array);
-        d = document.createElement('div');
-        d.className = 'step';
-        d.id = 'step_' + count;
-        count++;
-        for (i = 0; i < this.array.length; i++) {
-            space = '';
-            for (j = 0; j < this.array[i].length; j++) {
-                d.innerHTML += '<div class = "number">' + this.array[i][j] + '</div>';
-                space += '<div class = "space">&nbsp</div>';
-            }
-            d.innerHTML += space;
-        }
-        d.innerHTML += '<br>';
-        document.getElementById('inf').appendChild(d);
-    }
-
+    array = mergesort.Merge(array);
 }
