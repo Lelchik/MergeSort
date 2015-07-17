@@ -1,6 +1,10 @@
 function MergeSort() {
     this.array = [];
-
+    this.saw = []; //просмотренные массивы
+    this.count_saw = 0; //количество просмотернных элементов
+    var temp_array = [];
+    var use = [];
+    var length_array = 0;
     this.on = function(eventName, handler) {
         if (!this._eventHandlers) this._eventHandlers = [];
         if (!this._eventHandlers[eventName]) {
@@ -35,11 +39,13 @@ function MergeSort() {
     this.getArray = function(length) {
         console.log('length', length);
         var array = [];
+        length_array = length;
         for (var i = 0; i < length; i++) {
-            array[i] = new Array(1);
-            array[i][0] = Math.floor(Math.random() * 100);
+            this.array[i] = new Array(1);
+            this.array[i][0] = Math.floor(Math.random() * 100);
+            //temp_array[i] = this.array[i][0];
         }
-        return array;
+        return this.array;
     };
 
     function Break(Arr) {
@@ -52,6 +58,113 @@ function MergeSort() {
             else newArr[j / 2] = [Arr[j], Arr[j + 1]];
         }
         return newArr;
+    }
+
+    function isPositive(number) {
+        return number >= 0;
+    }
+
+    function isNegative(number) {
+        return number < 0;
+    }
+
+    function GetNumber(arr) {
+        //var arr = this.array;
+        //console.log(arr);
+        var i = 0;
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i].some(isPositive)) {
+                //      console.log(i);
+                break;
+            }
+        }
+        //console.log(i);
+        if (i == arr.length) return -1;
+        if (i % 2) i--;
+        return i;
+    }
+    var new_array = [];
+
+    this.Swap = function() {
+        var arr = this.array;
+        //console.log(arr);
+        if (arr.length === 1) {
+            this.trigger('sort_end', arr);
+            return;
+        }
+        var index = GetNumber(arr); //гарантированно есть либо в нем, либо в соседнем неотрицательный элемент
+        console.log('index', index, length_array);
+        if (index < 0) {
+
+            new_array[index / 2] = arr[length_array - 1].slice();
+            this.array = new_array.slice();
+            length_array = new_array.length;
+            new_array = [];
+            this.trigger('end_step', this.array);
+            return;
+        }
+        if (index === length_array - 1) {
+            console.log('length');
+            new_array[index / 2] = [];
+            for (var i = 0; i < arr[index].length; i++)
+                if (arr[index][i] >= 0) {
+                    //console.log(1);
+                    new_array[index / 2].push(arr[index][i]);
+                    arr[index][i] = -1;
+                }
+                //console.log(new_array, arr[index]);
+            this.trigger('end_array', index + 1);
+            return;
+        }
+        if (arr[index].every(isNegative)) {
+            console.log(arr[index+1].length);
+            for (var i = 0; i < arr[index + 1].length; i++) {
+                console.log(arr[index][i]);
+                if (arr[index + 1][i] >= 0) {
+                    new_array[index / 2].push(arr[index + 1][i]);
+                    arr[index + 1][i] = -1;
+                }
+            }
+            //console.log(new_array);
+            this.trigger('end_array', index);
+            return;
+        }
+        if (arr[index + 1].every(isNegative)) {
+            console.log(arr[index].length);
+            // console.log(arr[index].length);
+            for (var i = 0; i < arr[index].length; i++) {
+                console.log(arr[index][i]);
+                if (arr[index][i] >= 0) {
+                    // console.log(1);
+                    new_array[index / 2].push(arr[index][i]);
+                    arr[index][i] = -1;
+                }
+            }
+            //console.log(new_array, arr[index]);
+            this.trigger('end_array', index + 1);
+            return;
+        }
+        var ind1 = 0;
+        var ind2 = 0;
+        // console.log('new',new_array, index, ind1, ind2);
+        if (new_array.length <= (index / 2)) new_array[index / 2] = [];
+        while (arr[index][ind1] < 0 && ind1 < arr[index].length) ind1++;
+        while (arr[index + 1][ind2] < 0 && ind1 < arr[index + 1].length) ind2++;
+        //if (!new_array.hawOwnProperty(index/2)) new_array[index/2] = [];
+        if (arr[index][ind1] < arr[index + 1][ind2]) {
+            new_array[index / 2].push(arr[index][ind1]);
+            arr[index][ind1] = -1;
+            // console.log(new_array);
+            this.trigger('change', index);
+            return;
+        } else {
+            //if (!new_array.hawOwnProperty(index/2)) new_array[index/2] = [];
+            new_array[index / 2].push(arr[index + 1][ind2]);
+            arr[index + 1][ind2] = -1;
+            //console.log(new_array);
+            this.trigger('change', index + 1);
+            return;
+        }
     }
 
     this.Merge = function(Arr) {
@@ -108,7 +221,7 @@ function MergeSort() {
     };
 }
 
-function Start() {
+function Start_old() {
     var mergesort = new MergeSort();
     mergesort.on('first', function(data) {
         console.log('first', data, count_step);
@@ -127,15 +240,31 @@ function Start() {
         var data = array.length;
         console.log('end_merge', count_step, array.length);
         count_step++;
-        mergesort.show_string(count, array);
+        mergesort.show_string(count_step, array);
         if (data > 1 && count_step < 10) {
             array = mergesort.Merge(array);
         }
     });
 
     document.getElementById('inf').innerHTML = '';
-    array = mergesort.getArray(Math.floor(Math.random() * 15) + 1);
+    array = mergesort.getArray(4);
     mergesort.show_string(0, array);
     var count = 1;
     array = mergesort.Merge(array);
+}
+function Start() {
+var mergesort = new MergeSort();
+array = mergesort.getArray(5);
+mergesort.on("change", function(data) {
+    console.log("change", data, mergesort.array);
+});
+mergesort.on("end_array", function(data) {
+    console.log("end_array", data);
+});
+mergesort.on("end_step", function(data) {
+    console.log("end_step", data);
+});
+mergesort.on("sort_end", function(data) {
+    console.log("sort_end", data);
+});
 }
